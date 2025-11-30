@@ -1,0 +1,332 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Offline Train Booking Portal</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-mark">IR</div>
+        <div class="brand-text">
+          <div class="brand-title">Train Booking Portal</div>
+          <div class="brand-subtitle">Offline IRCTC Style Demo</div>
+        </div>
+      </div>
+      <nav class="main-nav" id="main-nav">
+        <button class="nav-link active" data-target="home-page">Home</button>
+        <button class="nav-link" data-target="book-page">Book Ticket</button>
+        <button class="nav-link" data-target="bookings-page">My Bookings</button>
+        <button class="nav-link" data-target="pnr-page">PNR Status</button>
+        <button class="nav-link" data-target="schedule-page">Train Schedule</button>
+        <button class="nav-link" data-target="profile-page">Profile</button>
+      </nav>
+      <div class="user-actions">
+        <span class="wallet-display" id="wallet-display">Wallet: ₹0</span>
+        <button class="logout-btn" id="logout-btn">Logout</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section class="page auth-page active" id="login-page">
+        <div class="auth-card">
+          <div class="auth-tabs">
+            <button class="auth-tab active" data-auth-tab="login-form">Login</button>
+            <button class="auth-tab" data-auth-tab="register-form">Register</button>
+          </div>
+          <div class="auth-body">
+            <form id="login-form" class="auth-form active">
+              <h2>Login to Continue</h2>
+              <div class="field">
+                <label>Email</label>
+                <input type="email" id="login-email" required>
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <input type="password" id="login-password" required>
+              </div>
+              <button type="submit" class="primary-btn full-width">Login</button>
+              <div class="auth-message" id="login-message"></div>
+            </form>
+
+            <form id="register-form" class="auth-form">
+              <h2>Create New Account</h2>
+              <div class="field">
+                <label>Full Name</label>
+                <input type="text" id="reg-name" required>
+              </div>
+              <div class="field">
+                <label>Email</label>
+                <input type="email" id="reg-email" required>
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <input type="password" id="reg-password" minlength="4" required>
+              </div>
+              <div class="field">
+                <label>Starting Wallet Balance (KEEP IT ATLEAST 3500)</label>
+                <input type="number" id="reg-wallet" min="0" value="0">
+              </div>
+              <button type="submit" class="primary-btn full-width">Register</button>
+              <div class="auth-message" id="register-message"></div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="page dashboard-page" id="home-page">
+        <div class="grid two">
+          <div class="card highlight-card">
+            <h2>Welcome</h2>
+            <p id="welcome-text">Plan and manage your train journeys in an IRCTC-style interface, fully offline on your system.</p>
+            <div class="highlight-actions">
+              <button class="primary-btn" data-target="book-page">Book a Ticket</button>
+              <button class="ghost-btn" data-target="bookings-page">View My Bookings</button>
+            </div>
+          </div>
+          <div class="card info-card">
+            <h3>Quick Info</h3>
+            <ul class="info-list">
+              <li>Search trains between major stations</li>
+              <li>Book tickets with multiple classes and quotas</li>
+              <li>Generate PNR and check booking status</li>
+              <li>View, manage and cancel previous bookings</li>
+              <li>Simple wallet-style fare tracking</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Today’s Summary</h3>
+          <div class="summary-row">
+            <div class="summary-item">
+              <div class="summary-label">Tickets Booked</div>
+              <div class="summary-value" id="summary-bookings">0</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">Total Spent (₹)</div>
+              <div class="summary-value" id="summary-spent">0</div>
+            </div>
+            <div class="summary-item">
+              <div class="summary-label">Active PNRs</div>
+              <div class="summary-value" id="summary-active-pnrs">0</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="book-page">
+        <div class="card">
+          <h2>Book Ticket</h2>
+          <form id="search-form" class="inline-form">
+            <div class="field">
+              <label>From</label>
+              <input type="text" id="from-station" placeholder="e.g. kota" required>
+            </div>
+            <div class="field">
+              <label>To</label>
+              <input type="text" id="to-station" placeholder="e.g. Delhi" required>
+            </div>
+            <div class="field">
+              <label>Journey Date</label>
+              <input type="date" id="journey-date" required>
+            </div>
+            <div class="field">
+              <label>Class</label>
+              <select id="journey-class">
+                <option value="ANY">Any</option>
+                <option value="SL">Sleeper (SL)</option>
+                <option value="3A">3A</option>
+                <option value="2A">2A</option>
+                <option value="1A">1A</option>
+                <option value="CC">Chair Car (CC)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Quota</label>
+              <select id="journey-quota">
+                <option value="GN">General</option>
+                <option value="TQ">Tatkal</option>
+                <option value="LD">Ladies</option>
+                <option value="SS">Senior Citizen</option>
+              </select>
+            </div>
+            <button type="submit" class="primary-btn search-btn">Search Trains</button>
+          </form>
+          <div id="search-message" class="inline-message"></div>
+        </div>
+
+        <div class="card">
+          <h3>Available Trains</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Train</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Departure</th>
+                  <th>Arrival</th>
+                  <th>Class</th>
+                  <th>Fare (₹)</th>
+                  <th>Available Seats</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="trains-results">
+                <tr><td colspan="9" class="placeholder">Search to see trains</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card hidden" id="passenger-card">
+          <h3>Passenger & Booking Details</h3>
+          <form id="passenger-form">
+            <div class="passenger-layout">
+              <div class="passenger-info">
+                <div class="field">
+                  <label>Passenger Name</label>
+                  <input type="text" id="passenger-name" required>
+                </div>
+                <div class="field">
+                  <label>Age</label>
+                  <input type="number" id="passenger-age" min="1" required>
+                </div>
+                <div class="field">
+                  <label>Gender</label>
+                  <select id="passenger-gender" required>
+                    <option value="">Select</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fare-summary">
+                <div class="fare-row">
+                  <span>Base Fare</span>
+                  <span id="fare-base">₹0</span>
+                </div>
+                <div class="fare-row">
+                  <span>GST</span>
+                  <span id="fare-gst">₹0</span>
+                </div>
+                <div class="fare-row total">
+                  <span>Total Fare</span>
+                  <span id="fare-total">₹0</span>
+                </div>
+              </div>
+            </div>
+            <div class="actions-end">
+              <button type="button" class="ghost-btn" id="cancel-passenger">Cancel</button>
+              <button type="submit" class="primary-btn">Confirm Booking</button>
+            </div>
+            <div id="booking-message" class="inline-message"></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="page" id="bookings-page">
+        <div class="card">
+          <h2>My Bookings</h2>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>PNR</th>
+                  <th>Train</th>
+                  <th>Date</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Class</th>
+                  <th>Status</th>
+                  <th>Fare (₹)</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="bookings-body">
+                <tr><td colspan="9" class="placeholder">No bookings yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="pnr-page">
+        <div class="card">
+          <h2>Check PNR Status</h2>
+          <form id="pnr-form" class="inline-form small">
+            <div class="field">
+              <label>Enter PNR</label>
+              <input type="text" id="pnr-input" maxlength="10" required>
+            </div>
+            <button type="submit" class="primary-btn">Check Status</button>
+          </form>
+          <div id="pnr-message" class="inline-message"></div>
+        </div>
+        <div class="card hidden" id="pnr-details-card">
+          <h3>PNR Details</h3>
+          <div class="details-grid" id="pnr-details"></div>
+        </div>
+      </section>
+
+      <section class="page" id="schedule-page">
+        <div class="card">
+          <h2>Train Schedule</h2>
+          <form id="schedule-form" class="inline-form small">
+            <div class="field">
+              <label>Filter By Station (optional)</label>
+              <input type="text" id="schedule-filter" placeholder="Station name">
+            </div>
+            <button type="submit" class="ghost-btn">Apply Filter</button>
+          </form>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Train No</th>
+                  <th>Name</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Departure</th>
+                  <th>Arrival</th>
+                  <th>Classes</th>
+                </tr>
+              </thead>
+              <tbody id="schedule-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="profile-page">
+        <div class="card">
+          <h2>Profile</h2>
+          <div class="details-grid" id="profile-details"></div>
+        </div>
+        <div class="card">
+          <h3>Change Password</h3>
+          <form id="password-form" class="inline-form small">
+            <div class="field">
+              <label>Current Password</label>
+              <input type="password" id="current-password" required>
+            </div>
+            <div class="field">
+              <label>New Password</label>
+              <input type="password" id="new-password" minlength="4" required>
+            </div>
+            <button type="submit" class="primary-btn">Update Password</button>
+          </form>
+          <div id="password-message" class="inline-message"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+
